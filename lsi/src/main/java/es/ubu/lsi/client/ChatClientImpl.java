@@ -58,13 +58,18 @@ public class ChatClientImpl implements ChatClient {
 
 	@Override
 	public void disconnect() {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void sendMessage(ChatMessage msg) {
-		// TODO Auto-generated method stub
+		try {
+			outputStream.writeObject(msg);
+			outputStream.flush();
+		} catch (IOException e) {
+			 System.out.println("Error al enviar mensaje: " + e.getMessage());
+		}
 		
 	}
 	
