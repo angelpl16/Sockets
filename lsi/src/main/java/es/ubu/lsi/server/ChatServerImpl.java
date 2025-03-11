@@ -27,5 +27,10 @@ public class ChatServerImpl implements ChatServer {
 		// TODO Auto-generated method stub
 
 	}
+	
+	public class ServerThreadForClient extends Thread {
+
+	}
+
 
 }

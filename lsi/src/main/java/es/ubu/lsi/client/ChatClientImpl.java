@@ -58,19 +58,37 @@ public class ChatClientImpl implements ChatClient {
 
 	@Override
 	public void disconnect() {
-		
+		try {
+            if (socket != null && !socket.isClosed()) {
+            	//Se cierra el socket para desconectar del servidor
+                socket.close();
+                System.out.println("Desconectado del servidor.");
+            }
+        } catch (IOException e) {
+            System.err.println("Error al cerrar el socket: " + e.getMessage());
+        }
 
 	}
 
 	@Override
 	public void sendMessage(ChatMessage msg) {
 		try {
-			outputStream.writeObject(msg);
+			outputStream.writeObject("Angel P." + msg);
 			outputStream.flush();
 		} catch (IOException e) {
 			 System.out.println("Error al enviar mensaje: " + e.getMessage());
 		}
 		
+	}
+	
+	public class ChatClientListener implements Runnable {
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 	
 	
