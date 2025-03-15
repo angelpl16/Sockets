@@ -85,8 +85,42 @@ public class ChatClientImpl implements ChatClient {
 
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			try (ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
+	            while (true) {
+	                try {
+	                    // Se lee un objeto desde la entrada
+	                    Object received = inputStream.readObject();
 
+	                    // Se verifica el tipo de objeto obtenido para saber si es un mensaje
+	                    if (received instanceof ChatMessage) {
+	                        ChatMessage msg = (ChatMessage) received;
+
+	                        // Comprobamos el tipo de mensaje
+	                        switch (msg.getType()) {
+	                            case MESSAGE:
+	                                System.out.println("Usuario " + msg.getId() + ": " + msg.getMessage());
+	                                break;
+	                            case LOGOUT:
+	                                System.out.println("El servidor ha solicitado tu desconexión.");
+	                                disconnect();
+	                                return; // Termina el hilo
+	                            case SHUTDOWN:
+	                                System.out.println("El servidor se está apagando. Se cerrará la conexión.");
+	                                disconnect();
+	                                return; // Termina el hilo
+	                            default:
+	                                System.out.println("Mensaje recibido con un tipo desconocido.");
+	                        }
+	                    } else {
+	                        System.out.println("Mensaje recibido con formato no reconocido.");
+	                    }
+	                } catch (ClassNotFoundException e) {
+	                    System.err.println("Error: No se pudo interpretar el mensaje recibido.");
+	                }
+	            }
+	        } catch (IOException e) {
+	            System.out.println("Conexión cerrada o error en el flujo de entrada: " + e.getMessage());
+	        }
 		}
 
 	}
