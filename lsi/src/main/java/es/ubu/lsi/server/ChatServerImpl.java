@@ -3,6 +3,8 @@ package es.ubu.lsi.server;
 import es.ubu.lsi.common.ChatMessage;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -34,20 +36,19 @@ public class ChatServerImpl implements ChatServer {
 	@Override
 	public void startup() {
 		try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Servidor iniciado en el puerto " + port);
-
-            while (alive) {
-                Socket clientSocket = serverSocket.accept();
-                if (!alive) break;
-
-                ServerThreadForClient clientThread = new ServerThreadForClient(clientSocket, clientId++);
-                clients.add(clientThread);
-                clientThread.start();
-            }
-        } catch (IOException e) {
-            System.err.println("Error en el servidor: " + e.getMessage());
-        }
+			alive = true;
+			serverSocket = new ServerSocket(port);
+			
+			while(alive) {
+				Socket socket = serverSocket.accept();
+				
+				ServerThreadForClient clientThread = new ServerThreadForClient(socket, clientId++);
+				
+				clients.add(clientThread);
+			}
+		} catch (IOException e) {
+			System.err.println("Error en la conexión con el cliente " + clientId + ": " + e.getMessage());
+		}
 
 	}
 
@@ -59,8 +60,10 @@ public class ChatServerImpl implements ChatServer {
 
 	@Override
 	public void broadcast(ChatMessage message) {
-		// TODO Auto-generated method stub
-
+		System.out.println("Broadcasting: " + message.getMessage());
+        for (ServerThreadForClient client : clients) {
+        	
+        }
 	}
 
 	@Override
@@ -70,6 +73,18 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	public class ServerThreadForClient extends Thread {
+		
+		private Socket socket;
+		
+		private int clientId;
+		
+		public ServerThreadForClient(Socket socket, int clientId) {
+			this.socket = socket;
+			this.clientId = clientId;
+			
+		}
+		
+		public void run()
 
 	}
 
