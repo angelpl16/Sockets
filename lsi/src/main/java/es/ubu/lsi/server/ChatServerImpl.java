@@ -81,11 +81,11 @@ public class ChatServerImpl implements ChatServer {
 	@Override
 	public void remove(int id) {
 		try {
-			if (clients.containsKey(id)) {
-
+			if (!clients.containsKey(id)) {
+				throw new ClientNotFoundException("No existe el cliente");
 			}
-		} catch (IOException e) {
-
+		} catch (ClientNotFoundException e) {
+			System.err.println(e.getMessage());
 		}
 
 	}
