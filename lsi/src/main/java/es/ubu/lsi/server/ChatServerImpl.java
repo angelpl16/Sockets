@@ -93,6 +93,9 @@ public class ChatServerImpl implements ChatServer {
 	public class ServerThreadForClient extends Thread {
 
 		private Socket socket;
+		private int id;
+		private ObjectOutputStream outputStream;
+		private ObjectInputStream inputStream;
 
 		public ServerThreadForClient(Socket socket) {
 			this.socket = socket;
@@ -100,11 +103,30 @@ public class ChatServerImpl implements ChatServer {
 		}
 
 		public void run() {
-
+			try {
+				while (alive) {
+					ChatMessage message = (ChatMessage) inputStream.readObject();
+					if (message.getType() == ChatMessage.MessageType.LOGOUT) {
+						remove(id);
+						break;
+					} else {
+						broadcast(message);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				shutdown();
+			}
 		}
 
 		public void sendMessage(ChatMessage message) {
-
+			try {
+				outputStream.writeObject(message);
+				outputStream.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public void disconnect() {
