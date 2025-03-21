@@ -11,40 +11,41 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ChatServerImpl implements ChatServer {
-	
+
 	public static final int DEFAULT_PORT = 1500;
-	
+
 	private int port;
-	
+
 	private boolean alive;
-	
+
 	private int clientId = 0;
-	
-	private List<ServerThreadForClient> clients;
-	
+
+	private Map<Integer, ServerThreadForClient> clients;
+
 	private SimpleDateFormat sdf;
-	
+
 	private ServerSocket serverSocket;
-	
+
 	public ChatServerImpl(int port) {
-        this.port = port;
-        this.clients = new ArrayList<>();
-        this.sdf = new SimpleDateFormat("HH:mm:ss");
-        this.alive = true;
-    }
-	
+		this.port = port;
+		this.clients = new HashMap<>();
+		this.sdf = new SimpleDateFormat("HH:mm:ss");
+		this.alive = true;
+	}
+
 	@Override
 	public void startup() {
 		try {
 			alive = true;
 			serverSocket = new ServerSocket(port);
-			
-			while(alive) {
+
+			while (alive) {
 				Socket socket = serverSocket.accept();
-				
-				ServerThreadForClient clientThread = new ServerThreadForClient(socket, clientId++);
-				
-				clients.add(clientThread);
+
+				ServerThreadForClient clientThread = new ServerThreadForClient(socket);
+
+				clients.put(clientId, clientThread);
+				clientThread.start();
 			}
 		} catch (IOException e) {
 			System.err.println("Error en la conexión con el cliente " + clientId + ": " + e.getMessage());
@@ -54,39 +55,62 @@ public class ChatServerImpl implements ChatServer {
 
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
+		try {
+			alive = false;
+			if (serverSocket != null && !serverSocket.isClosed()) {
+				serverSocket.close();
 
+			}
+		} catch (IOException e) {
+			System.err.println("Error al cerrar el ServerSocket: " + e.getMessage());
+		}
 	}
 
 	@Override
 	public void broadcast(ChatMessage message) {
-		System.out.println("Broadcasting: " + message.getMessage());
-        for (ServerThreadForClient client : clients) {
-        	
-        }
+		// Hay que enviar mensajes a todos los clientes de la lista 'Clientes'.
+		// El tipo de los valores necesita una funcion enviar.
+
+		for (ServerThreadForClient client : clients.values()) {
+
+			client.sendMessage(message);
+
+		}
 	}
 
 	@Override
 	public void remove(int id) {
-		// TODO Auto-generated method stub
+		try {
+			if (clients.containsKey(id)) {
 
-	}
-	
-	public class ServerThreadForClient extends Thread {
-		
-		private Socket socket;
-		
-		private int clientId;
-		
-		public ServerThreadForClient(Socket socket, int clientId) {
-			this.socket = socket;
-			this.clientId = clientId;
-			
+			}
+		} catch (IOException e) {
+
 		}
-		
-		public void run()
 
 	}
 
+	public class ServerThreadForClient extends Thread {
+
+		private Socket socket;
+
+		public ServerThreadForClient(Socket socket) {
+			this.socket = socket;
+
+		}
+
+		public void run() {
+
+		}
+
+		public void sendMessage(ChatMessage message) {
+
+		}
+
+		public void disconnect() {
+
+		}
+
+	}
 
 }
