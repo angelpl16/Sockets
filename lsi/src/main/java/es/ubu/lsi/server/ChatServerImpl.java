@@ -89,6 +89,11 @@ public class ChatServerImpl implements ChatServer {
 		}
 
 	}
+	
+	public static void main(String[] args) {
+        ChatServerImpl server = new ChatServerImpl(DEFAULT_PORT);
+        server.startup();
+    }
 
 	public class ServerThreadForClient extends Thread {
 
@@ -130,7 +135,16 @@ public class ChatServerImpl implements ChatServer {
 		}
 
 		public void disconnect() {
-
+			try {
+				if (socket != null)
+					socket.close();
+				if (outputStream != null)
+					outputStream.close();
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
